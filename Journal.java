@@ -1,41 +1,34 @@
 import java.util.*;
 
 public class Journal {
+
     private final List<JournalEntry> entries = new ArrayList<>();
-    private int count = 0;
 
-    public void addEntry(JournalEntry entry) {
+    // Method to add entries
+    public boolean addEntry(JournalEntry entry) {
+        if (entry == null || entry.getEntry().trim().isEmpty()) {
+            return false;
+        }
+
         entries.add(entry);
-        count++;
-        System.out.println("Entry Added\n");
+        return true;
     }
 
-    public void viewEntries() {
-        if (entries.isEmpty()) {
-            System.out.println("No Entries Found");
-            return;
-        }
-
-        int entryNum = 1;
-        for (JournalEntry entry : entries) {
-            System.out.println("Entry " + entryNum++);
-            System.out.println(entry);
-        }
-        System.out.println("Total Entries: " + count);
+    // Returns list of all entries
+    public List<JournalEntry> getEntries() {
+        return new ArrayList<>(entries);
     }
 
-    public void deleteEntry(int index) {
-        index -= 1;
+    // Method to delete an entry
+    public boolean deleteEntry(int index) {
         if (index >= 0 && index < entries.size()) {
             entries.remove(index);
-            count--;
-            System.out.println("Entry Deleted");
-        } else {
-            System.out.println("Invalid Option\n");
+            return true;
         }
+        return false;
     }
 
-    public List<JournalEntry> getEntries() {
-        return entries;
+    public int getEntryCount() {
+        return entries.size();
     }
 }
