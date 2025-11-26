@@ -1,15 +1,20 @@
-import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
-public class JournalGUI extends Application {
+public class JournalGUI {
 
     private final App app = new App();
+    private final Scene scene;
 
-    @Override
-    public void start(Stage stage) {
+    public JournalGUI(HomepageGUI homeController, Stage stage) {
+
+        // --- Back Button ---
+        Button backButton = new Button("← Back");
+        backButton.setOnAction(e -> homeController.goToHome(stage));
+
         // --- Input Fields ---
         TextField titleField = new TextField();
         titleField.setPromptText("Title");
@@ -20,14 +25,13 @@ public class JournalGUI extends Application {
 
         ComboBox<String> moodComboBox = new ComboBox<>();
         moodComboBox.getItems().addAll("Happy", "Sad", "Neutral", "Stressed", "Excited");
-        moodComboBox.setValue("Neutral"); // default
+        moodComboBox.setValue("Neutral");
 
         Button addButton = new Button("Add Entry");
 
         // --- Display List ---
         ListView<String> listView = new ListView<>();
         Label countLabel = new Label("Total Entries: 0");
-
         Button deleteButton = new Button("Delete Selected Entry");
 
         // --- Layout ---
@@ -37,8 +41,11 @@ public class JournalGUI extends Application {
         VBox listBox = new VBox(5, listView, deleteButton, countLabel);
         listBox.setPrefWidth(400);
 
-        HBox root = new HBox(10, inputBox, listBox);
-        root.setPadding(new javafx.geometry.Insets(10));
+        HBox content = new HBox(10, inputBox, listBox);
+        content.setPadding(new Insets(10));
+
+        VBox root = new VBox(10, backButton, content);
+        root.setPadding(new Insets(10));
 
         // --- Button Actions ---
         addButton.setOnAction(e -> {
@@ -57,20 +64,20 @@ public class JournalGUI extends Application {
         });
 
         deleteButton.setOnAction(e -> {
-            int selectedIndex = listView.getSelectionModel().getSelectedIndex();
-            if (selectedIndex >= 0) {
-                app.deleteEntry(selectedIndex);
+            int idx = listView.getSelectionModel().getSelectedIndex();
+            if (idx >= 0) {
+                app.deleteEntry(idx);
                 refreshList(listView, countLabel);
             } else {
                 showAlert("Select an entry to delete!");
             }
         });
 
-        // --- Scene & Stage ---
-        Scene scene = new Scene(root);
-        stage.setScene(scene);
-        stage.setTitle("Wellness Journal");
-        stage.show();
+        scene = new Scene(root, 800, 500);
+    }
+
+    public Scene getScene() {
+        return scene;
     }
 
     private void refreshList(ListView<String> listView, Label countLabel) {
@@ -87,9 +94,5 @@ public class JournalGUI extends Application {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
-    }
-
-    public static void main(String[] args) {
-        launch();
     }
 }
