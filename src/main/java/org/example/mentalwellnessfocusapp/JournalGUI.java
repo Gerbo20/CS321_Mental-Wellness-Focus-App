@@ -3,9 +3,18 @@ package org.example.mentalwellnessfocusapp;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
-import javafx.scene.layout.*;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class JournalGUI {
@@ -57,7 +66,10 @@ public class JournalGUI {
         TextArea entryArea = new TextArea();
         entryArea.setPromptText("Write your thoughts here...");
         entryArea.setWrapText(true);
-        entryArea.setPrefRowCount(6);
+        entryArea.setPrefRowCount(10);
+        entryArea.setMinHeight(160);
+        entryArea.setMaxHeight(220);
+
 
         // Subtitle labels (Title, Mood, Entry)
         Label titleLabel = new Label("Title:");
@@ -160,6 +172,8 @@ public class JournalGUI {
 
             if (app.addEntry(title, mood, entry)) {
                 refreshList(listView, countLabel);
+                // clear selection + fields after saving
+                listView.getSelectionModel().clearSelection();
                 titleField.clear();
                 entryArea.clear();
                 moodBox.getSelectionModel().clearSelection();
@@ -173,6 +187,11 @@ public class JournalGUI {
             if (index >= 0) {
                 if (app.deleteEntry(index)) {
                     refreshList(listView, countLabel);
+                    // clear fields after delete
+                    listView.getSelectionModel().clearSelection();
+                    titleField.clear();
+                    entryArea.clear();
+                    moodBox.getSelectionModel().clearSelection();
                 }
             } else {
                 showAlert("Select an entry to delete.");
