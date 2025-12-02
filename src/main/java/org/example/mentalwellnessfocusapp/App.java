@@ -40,89 +40,87 @@ public class App {
 
     // Console menu for testing without GUI
     public void runConsole() {
-        java.util.Scanner scan = new java.util.Scanner(System.in);
-        boolean run = true;
+        // try-with-resources – Scanner is auto-closed
+        try (java.util.Scanner scan = new java.util.Scanner(System.in)) {
+            boolean run = true;
 
-        while (run) {
-            System.out.println("|==={ Wellness Journal }===|");
-            System.out.println("[1] Add Entry");
-            System.out.println("[2] View Entries");
-            System.out.println("[3] Delete Entry");
-            System.out.println("[4] Exit");
-            System.out.println("|==========================|");
-            System.out.print("Enter Your Choice: ");
+            while (run) {
+                System.out.println("|==={ Wellness Journal }===|");
+                System.out.println("[1] Add Entry");
+                System.out.println("[2] View Entries");
+                System.out.println("[3] Delete Entry");
+                System.out.println("[4] Exit");
+                System.out.println("|==========================|");
+                System.out.print("Enter Your Choice: ");
 
-            int choice;
-            try {
-                choice = scan.nextInt();
-                scan.nextLine(); // consume newline
-            } catch (java.util.InputMismatchException e) {
-                System.out.println("Invalid Entry\n");
-                scan.nextLine();
-                continue;
-            }
+                int choice;
+                try {
+                    choice = scan.nextInt();
+                    scan.nextLine(); // consume newline
+                } catch (java.util.InputMismatchException e) {
+                    System.out.println("Invalid Entry\n");
+                    scan.nextLine();
+                    continue;
+                }
 
-            switch (choice) {
-                case 1:
-                    System.out.print("Enter Title: ");
-                    String title = scan.nextLine().trim();
+                switch (choice) {
+                    case 1 -> {
+                        System.out.print("Enter Title: ");
+                        String title = scan.nextLine().trim();
 
-                    System.out.print("Enter Mood: ");
-                    String mood = scan.nextLine().trim();
+                        System.out.print("Enter Mood: ");
+                        String mood = scan.nextLine().trim();
 
-                    System.out.print("Enter Entry: ");
-                    String entry = scan.nextLine().trim();
+                        System.out.print("Enter Entry: ");
+                        String entry = scan.nextLine().trim();
 
-                    if (!addEntry(title, mood, entry)) {
-                        System.out.println("Entry Cannot Be Empty\n");
-                    } else {
-                        System.out.println("Entry Added!\n");
-                    }
-                    break;
-                case 2:
-                    List<JournalEntry> entries = getEntries();
-                    if (entries.isEmpty()) {
-                        System.out.println("No Entries Found\n");
-                    } else {
-                        int num = 1;
-                        System.out.println();
-                        for (JournalEntry e : entries) {
-                            System.out.println("Entry " + num++ + "\n" + e);
-                        }
-                        System.out.println("Total Entries: " + getEntryCount() + "\n");
-                    }
-                    break;
-                case 3:
-                    entries = getEntries();
-                    if (entries.isEmpty()) {
-                        System.out.println("No Entries Available\n");
-                        break;
-                    }
-                    int i = 1;
-                    for (JournalEntry e : entries) {
-                        System.out.println("Entry " + i++ + ": " + e.getEntry() + "\n");
-                    }
-                    System.out.print("Select an Entry to Delete: ");
-                    try {
-                        int index = scan.nextInt() - 1;
-                        if (deleteEntry(index)) {
-                            System.out.println("Entry Deleted!\n");
+                        if (!addEntry(title, mood, entry)) {
+                            System.out.println("Entry Cannot Be Empty\n");
                         } else {
-                            System.out.println("Invalid Entry\n");
+                            System.out.println("Entry Added!\n");
                         }
-                    } catch (java.util.InputMismatchException e) {
-                        System.out.println("Invalid Entry\n");
-                        scan.nextLine();
                     }
-                    break;
-                case 4:
-                    run = false;
-                    break;
-                default:
-                    System.out.println("Invalid Option\n");
+                    case 2 -> {
+                        java.util.List<JournalEntry> entries = getEntries();
+                        if (entries.isEmpty()) {
+                            System.out.println("No Entries Found\n");
+                        } else {
+                            int num = 1;
+                            System.out.println();
+                            for (JournalEntry e : entries) {
+                                System.out.println("Entry " + num++ + "\n" + e);
+                            }
+                            System.out.println("Total Entries: " + getEntryCount() + "\n");
+                        }
+                    }
+                    case 3 -> {
+                        java.util.List<JournalEntry> entries = getEntries();
+                        if (entries.isEmpty()) {
+                            System.out.println("No Entries Available\n");
+                        } else {
+                            int i = 1;
+                            for (JournalEntry e : entries) {
+                                System.out.println("Entry " + i++ + ": " + e.getEntry() + "\n");
+                            }
+                            System.out.print("Select an Entry to Delete: ");
+                            try {
+                                int index = scan.nextInt() - 1;
+                                if (deleteEntry(index)) {
+                                    System.out.println("Entry Deleted!\n");
+                                } else {
+                                    System.out.println("Invalid Entry\n");
+                                }
+                            } catch (java.util.InputMismatchException e) {
+                                System.out.println("Invalid Entry\n");
+                                scan.nextLine();
+                            }
+                        }
+                    }
+                    case 4 -> run = false;
+                    default -> System.out.println("Invalid Option\n");
+               }
             }
         }
-        scan.close();
     }
 
     public static void main(String[] args) {
