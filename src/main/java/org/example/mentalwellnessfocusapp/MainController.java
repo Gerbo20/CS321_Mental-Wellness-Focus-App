@@ -71,6 +71,4 @@ public class MainController {
         // String msg = notificationManager.getDailyStreakMessage();
         // welcomeText.setText("Your current streak info:\n" + msg);
     }
-
-    // (Optional: you can keep your old button handlers if you still use them elsewhere)
 }
