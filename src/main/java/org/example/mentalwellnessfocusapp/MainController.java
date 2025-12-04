@@ -64,16 +64,18 @@ public class MainController {
     protected void onBreathingExercises() {
         // Simulate completing a breathing exercise
         completeActivity(ActivityType.BREATHING);
+        // Open the Breathing Exercises GUI window
+        BreathingGUI.show(streakTracker, activityLog, notificationManager);
 
-        welcomeText.setText("""
-            Breathing Exercises: 
+        // welcomeText.setText("""
+        //     Breathing Exercises: 
 
-            • Inhale for 4 seconds
-            • Hold for 4 seconds
-            • Exhale for 6 seconds
+        //     • Inhale for 4 seconds
+        //     • Hold for 4 seconds
+        //     • Exhale for 6 seconds
 
-            Repeat this a few times to reset your nervous system."""
-        );
+        //     Repeat this a few times to reset your nervous system."""
+        // );
     }
 
     // Journal Entry button handler
