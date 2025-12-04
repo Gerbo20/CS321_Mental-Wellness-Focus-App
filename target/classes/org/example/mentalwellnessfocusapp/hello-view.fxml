@@ -19,8 +19,8 @@
                 -fx-text-fill: #333333;" />
     </HBox>
 
-    <Label fx:id="welcomeText" alignment="CENTER" text="Welcome back, Friend 🌱" style="-fx-font-size: 26px; 
-                -fx-font-weight: bold;"/>
+    <Label fx:id="welcomeText" alignment="CENTER" textAlignment="CENTER" wrapText="true" maxWidth="300" text="Welcome to your Mental Wellness Focus App! 🌱" style="-fx-font-size: 26px; 
+            -fx-font-weight: bold;"/>
 
     <!-- 2x2 Grid of Rounded Tiles -->
     <GridPane fx:id="titleGrid" hgap="20" vgap="20" alignment="CENTER" prefWidth="310" prefHeight="384">
