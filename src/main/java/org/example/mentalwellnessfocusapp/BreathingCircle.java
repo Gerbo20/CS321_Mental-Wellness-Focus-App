@@ -56,11 +56,14 @@ public class BreathingCircle extends StackPane {
     /**
      * Start an infinite inhale/exhale animation.
      */
-    public void startBreathing(Duration inhaleDuration, Duration exhaleDuration) {
+    public void startBreathing(Duration inhaleDuration, Duration holdDuration, Duration exhaleDuration) {
+
+        // Stop any previous animation
         if (breathingSequence != null) {
             breathingSequence.stop();
         }
 
+        // Inhale animation
         Timeline inhale = createRadiusAnimation(
                 innerCircle,
                 minInnerRadius,
@@ -68,6 +71,16 @@ public class BreathingCircle extends StackPane {
                 inhaleDuration
         );
 
+        // Hold at max radius (no radius change, just "wait")
+        Timeline hold = new Timeline(new KeyFrame(
+                holdDuration,
+                new KeyValue(
+                        innerCircle.radiusProperty(),
+                        maxInnerRadius,
+                        Interpolator.DISCRETE)
+        ));
+
+        // Exhale animation
         Timeline exhale = createRadiusAnimation(
                 innerCircle,
                 maxInnerRadius,
@@ -75,11 +88,23 @@ public class BreathingCircle extends StackPane {
                 exhaleDuration
         );
 
-        breathingSequence = new SequentialTransition(inhale, exhale);
+        // If holdDuration is 0, you *can* still include it, but it's cleaner to skip:
+        if (holdDuration.greaterThan(Duration.ZERO)) {
+            breathingSequence = new SequentialTransition(inhale, hold, exhale);
+        } else {
+            breathingSequence = new SequentialTransition(inhale, exhale);
+        }
+
         breathingSequence.setCycleCount(Animation.INDEFINITE);
         breathingSequence.play();
+}
+
+    // Overloaded method for inhale/exhale without hold
+    public void startBreathing(Duration inhaleDuration, Duration exhaleDuration) {
+        startBreathing(inhaleDuration, Duration.ZERO, exhaleDuration);
     }
 
+    // Stop the breathing animation
     public void stopBreathing() {
         if (breathingSequence != null) {
             breathingSequence.stop();

@@ -119,31 +119,44 @@ public class BreathingGUI {
 
         // 4 seconds inhale, 4 seconds exhale
         Duration inhale = Duration.seconds(4);
-        Duration exhale = Duration.seconds(4);
+        Duration hold = Duration.seconds(4);
+        Duration exhale = Duration.seconds(6);
 
-        breathingCircle.startBreathing(inhale, exhale);
-        startPhaseTextCycle(inhale, exhale);
+        breathingCircle.startBreathing(inhale, hold, exhale);
+        startPhaseTextCycle(inhale, hold, exhale);
         startButton.setDisable(true);
     }
 
-    private void startPhaseTextCycle(Duration inhale, Duration exhale) {
+    private void startPhaseTextCycle(Duration inhale, Duration hold, Duration exhale) {
         if (phaseTimeline != null) {
             phaseTimeline.stop();
         }
 
         double inhaleSecs = inhale.toSeconds();
+        double holdSecs   = hold.toSeconds();
         double exhaleSecs = exhale.toSeconds();
-        double cycleSecs = inhaleSecs + exhaleSecs;
+        double cycleSecs = inhaleSecs + holdSecs + exhaleSecs;
 
         phaseTimeline = new Timeline(
+                // before inhale: INHALE
                 new KeyFrame(Duration.ZERO, e -> {
                     breathingCircle.setPhaseText("Inhale");
                     phaseLabel.setText("Breathe in slowly...");
                 }),
+
+                // after inhale: HOLD
                 new KeyFrame(Duration.seconds(inhaleSecs), e -> {
+                    breathingCircle.setPhaseText("Hold");
+                    phaseLabel.setText("Gently hold your breath...");
+                }),
+
+                // after inhale + hold: EXHALE
+                new KeyFrame(Duration.seconds(inhaleSecs + holdSecs), e -> {
                     breathingCircle.setPhaseText("Exhale");
                     phaseLabel.setText("Breathe out gently...");
                 }),
+
+                // after full cycle: repeat
                 new KeyFrame(Duration.seconds(cycleSecs))
         );
         phaseTimeline.setCycleCount(Timeline.INDEFINITE);
