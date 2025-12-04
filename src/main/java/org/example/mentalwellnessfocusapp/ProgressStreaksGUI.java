@@ -80,7 +80,14 @@ public class ProgressStreaksGUI {
         scoreCol.setCellValueFactory(c ->
                 new SimpleIntegerProperty(c.getValue().getScore()));
 
-        table.getColumns().addAll(java.util.List.of(dateCol, focusCol, breathCol, journalCol, scoreCol));
+        // table.getColumns().addAll(java.util.List.of(dateCol, focusCol, breathCol, journalCol, scoreCol));
+
+        // Add columns one-by-one (avoids generic-array warnings)
+        table.getColumns().add(dateCol);
+        table.getColumns().add(focusCol);
+        table.getColumns().add(breathCol);
+        table.getColumns().add(journalCol);
+        table.getColumns().add(scoreCol);
 
         List<DayActivity> allDays = log.getAllDays();
         table.getItems().setAll(allDays);
@@ -128,7 +135,13 @@ public class ProgressStreaksGUI {
                     label, day.isDidJournal() ? 1 : 0));
         }
 
-        chart.getData().addAll(java.util.List.of(focusSeries, breathingSeries, journalSeries));
+        // chart.getData().addAll(java.util.List.of(focusSeries, breathingSeries, journalSeries));
+        
+        // Add series one-by-one (avoids generic-array warnings)
+        chart.getData().add(focusSeries);
+        chart.getData().add(breathingSeries);
+        chart.getData().add(journalSeries);
+        
         chart.setPrefHeight(220);
 
         VBox content = new VBox(10, summary, chart, table);

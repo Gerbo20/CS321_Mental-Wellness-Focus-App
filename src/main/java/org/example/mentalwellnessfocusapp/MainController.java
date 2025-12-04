@@ -1,51 +1,68 @@
 package org.example.mentalwellnessfocusapp;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 
-public class MainController {
-
-    @FXML 
+// Main controller for the Mental Wellness Focus App
+public class MainController {   
+    
+    // UI components
+    @FXML
     private Label welcomeText;
-
+    
+    // Core components
     private final ActivityLog activityLog = new ActivityLog();
-
-    // @FXML 
-    // private StackPane focusTile;
-
-    // @FXML 
-    // private StackPane breathingTile;
-
-    // @FXML 
-    // private StackPane journalTile;
-
-    // @FXML 
-    // private StackPane streakTile;
-
-    // Streak + notification system
+    // Streak tracker and notification manager
     private final StreakTracker streakTracker = new StreakTracker();
-    private final NotificationManager notificationManager =
-            new NotificationManager(streakTracker);
+    // Notification manager to handle daily streak messages
+    private final NotificationManager notificationManager = new NotificationManager(streakTracker);
 
+    // Helper method to complete an activity and update the streak tracker
+    private  void completeActivity(ActivityType activityType) {
+        activityLog.recordToday(activityType);
+        streakTracker.completeToday();
+    }
+
+    // Initialization method called by JavaFX after FXML is loaded
     @FXML
     public void initialize() {
         welcomeText.setText("Welcome to your Mental Wellness Focus App 🌱");
     }
 
-    // TILE: Focus Session  (use this as “complete today’s task”)
+    // Menu button handler
+    @FXML
+    private void onMenuClicked() {
+        // For now just log or print something
+        System.out.println(">>> Menu button clicked");
+        
+        // For now: simple menu popup so the app runs without crashing.
+        Alert menuAlert = new Alert(Alert.AlertType.INFORMATION);
+        menuAlert.setTitle("Menu");
+        menuAlert.setHeaderText(null);
+        menuAlert.setContentText("Here we’ll later add:\n\n• Sign in / Switch user\n• Exit app");
+        menuAlert.showAndWait();
+
+        // Later you can open your sliding panel or popup here
+        // e.g. show a small window with "Sign in" and "Exit"
+    }
+
+    // Focus Session button handler
     @FXML
     protected void onFocusSession() {
-        activityLog.recordToday(ActivityType.FOCUS);
-        // streakTracker.completeToday();
-
+        // Simulate completing a focus session
+        completeActivity(ActivityType.FOCUS);
+        
         String msg = notificationManager.getDailyStreakMessage();
         welcomeText.setText("Focus Session complete!\n" + msg);
     }
 
-    // TILE: Breathing Exercises
+    // Breathing Exercises button handler
     @FXML
     protected void onBreathingExercises() {
-        activityLog.recordToday(ActivityType.BREATHING);
+        // Simulate completing a breathing exercise
+        completeActivity(ActivityType.BREATHING);
+
         welcomeText.setText("""
             Breathing Exercises: 
 
@@ -57,18 +74,18 @@ public class MainController {
         );
     }
 
-    // TILE: Journal Entry  (you can later open your JournalGUI here)
+    // Journal Entry button handler
     @FXML
     protected void onJournalEntry() {
-        activityLog.recordToday(ActivityType.JOURNAL);
+        // Simulate completing a journal entry
+        completeActivity(ActivityType.JOURNAL);
+        // Open the journal GUI window
         JournalGUI.showJournalWindow();
     }
 
-    // TILE: Progress Streaks
+    // Progress & Streaks button handler
     @FXML
     protected void onProgressStreaks() {
         ProgressStreaksGUI.show(streakTracker, activityLog);
-        // String msg = notificationManager.getDailyStreakMessage();
-        // welcomeText.setText("Your current streak info:\n" + msg);
     }
 }

@@ -15,6 +15,11 @@ public class ActivityLog {
     private DayActivity getOrCreate(LocalDate date) {
         return days.computeIfAbsent(date, DayActivity::new);
     }
+    
+    // DataStore can insert fully-built DayActivity <<<
+    void putDay(DayActivity day) {
+        days.put(day.getDate(), day);
+    }
 
     public void recordToday(ActivityType type) {
         LocalDate today = LocalDate.now();

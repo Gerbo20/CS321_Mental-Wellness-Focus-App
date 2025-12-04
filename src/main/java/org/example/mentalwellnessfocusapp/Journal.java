@@ -1,37 +1,42 @@
 package org.example.mentalwellnessfocusapp;
 
-import java.util.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class Journal {
-
+    // All journal entries for this run of the app
     private final List<JournalEntry> entries = new ArrayList<>();
-
-    // Method to add entries
-    public boolean addEntry(JournalEntry entry) {
-        if (entry == null || entry.getEntry().trim().isEmpty()) {
+    // Add a new journal entry.
+    // Returns false if both title and entry are blank.
+    public boolean addEntry(String title, String mood, String text) {
+        // Simple validation: must have some text
+        if ((title == null || title.isBlank()) &&
+            (text == null || text.isBlank())) {
             return false;
         }
-
-        entries.add(entry);
+        if (mood == null || mood.isBlank()) {
+            mood = "Unspecified";
+        }
+        entries.add(new JournalEntry(title, mood, text, LocalDate.now()));
         return true;
     }
-
-    // Returns list of all entries
-    public List<JournalEntry> getEntries() {
-        return new ArrayList<>(entries);
-    }
-
-    // Method to delete an entry
+    // Delete the entry at the given index.
+    // Returns true if deleted, false if index invalid.
     public boolean deleteEntry(int index) {
-        if (index >= 0 && index < entries.size()) {
-            entries.remove(index);
-            return true;
+        if (index < 0 || index >= entries.size()) {
+            return false;
         }
-        return false;
+        entries.remove(index);
+        return true;
     }
-
+    // Read-only view of all entries.
+    public List<JournalEntry> getEntries() {
+        return Collections.unmodifiableList(entries);
+    }
+    // Get the total number of entries.
     public int getEntryCount() {
-
         return entries.size();
     }
 }

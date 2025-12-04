@@ -1,46 +1,40 @@
 package org.example.mentalwellnessfocusapp;
 
-import java.time.*;
+import java.time.LocalDate;
 
 public class JournalEntry {
+
     private final String title;
     private final String mood;
-    private final LocalDate date;
     private final String entry;
-    
-    // Constructor for JournalEntry
-    public JournalEntry(String title, String mood, String entry) {
+    private final LocalDate date;
+
+    public JournalEntry(String title, String mood, String entry, LocalDate date) {
         this.title = title;
         this.mood = mood;
-        this.date = LocalDate.now();
         this.entry = entry;
+        this.date = date;
     }
 
-    // Gets the current date when entry is created
-    public LocalDate getDate() {
-        return date;
-    }
-
-    // Gets the title of the entry
     public String getTitle() {
         return title;
     }
 
-    // Gets the chosen mood for the entry (Selection tab available in GUI)
     public String getMood() {
         return mood;
     }
 
-    // The entry itself
     public String getEntry() {
         return entry;
     }
 
-    // String representation of how the entry will be displayed
+    public LocalDate getDate() {
+        return date;
+    }
+
     @Override
     public String toString() {
-        return "{" + getDate() +"} [" + mood + "]\n" +
-        "Title: " + title + "\n" +
-        "==============================\n\n" + "\"" + entry + "\"" + "\n\n==============================\n";
+        // Only used if a ListView prints the entry directly
+        return date + " - " + title + " (" + mood + ")";
     }
 }

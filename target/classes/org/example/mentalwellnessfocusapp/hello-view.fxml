@@ -6,42 +6,27 @@
 <?import javafx.scene.layout.*?>
 
 <VBox xmlns="http://javafx.com/javafx/17"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="org.example.mentalwellnessfocusapp.MainController"
-      spacing="20"
-      alignment="TOP_CENTER"
-      style="-fx-background-color: #f5f5f5;"
-        prefWidth="360"
-        prefHeight="640">
+    xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.mentalwellnessfocusapp.MainController" spacing="24" alignment="TOP_CENTER" style="-fx-background-color: #f5f5f5;" prefWidth="360" prefHeight="640">
 
     <padding>
         <Insets bottom="25" left="25" right="25" top="25"/>
     </padding>
 
-    <!-- Title -->
-    <Label fx:id="welcomeText"
-           text="Welcome to your Mental Wellness Focus App 🌿"
-           wrapText="true"
-           maxWidth="350"
-           textAlignment="CENTER"
-           alignment="CENTER"
-           style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+    <!-- Top bar: sandwich button + title -->
+    <HBox spacing="12" alignment="TOP_LEFT">
+        <Button fx:id="menuButton" text="≡" onAction="#onMenuClicked" style="-fx-font-size: 18px;
+                -fx-background-color: transparent;
+                -fx-text-fill: #333333;" />
+
+        <Label fx:id="welcomeText" text="Welcome back, Friend 🌱" style="-fx-font-size: 28px; 
+                -fx-font-weight: bold;"/>
+    </HBox>
 
     <!-- 2x2 Grid of Rounded Tiles -->
-    <GridPane fx:id="titleGrid"
-              hgap="20"
-              vgap="20"
-              alignment="CENTER"
-              prefWidth="310"
-              prefHeight="384">
+    <GridPane fx:id="titleGrid" hgap="20" vgap="20" alignment="CENTER" prefWidth="310" prefHeight="384">
 
         <!-- Focus Session -->
-        <StackPane fx:id="focusTile"
-                   GridPane.rowIndex="0" GridPane.columnIndex="0"
-                   onMouseClicked="#onFocusSession"
-                   prefWidth="160"
-                   prefHeight="160"
-                   style="-fx-background-color: linear-gradient(#a9e37a, #6ac352);
+        <StackPane fx:id="focusTile" GridPane.rowIndex="0" GridPane.columnIndex="0" onMouseClicked="#onFocusSession" prefWidth="160" prefHeight="160" style="-fx-background-color: linear-gradient(#a9e37a, #6ac352);
                           -fx-background-radius: 28;
                           -fx-border-radius: 28;
                           -fx-border-color: rgba(0,0,0,0.15);
@@ -53,21 +38,12 @@
                         <Image url="@icons/focus.png"/>
                     </image>
                 </ImageView>
-                <Label text="Focus Session"
-                       wrapText="true"
-                       textAlignment="CENTER"
-                       prefWidth="130"
-                       style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                <Label text="Focus Session" wrapText="true" textAlignment="CENTER" maxWidth="130" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: white;"/>
             </VBox>
         </StackPane>
 
         <!-- Breathing Exercises -->
-        <StackPane fx:id="breathingTile"
-                   GridPane.rowIndex="0" GridPane.columnIndex="1"
-                   onMouseClicked="#onBreathingExercises"
-                   prefWidth="160"
-                   prefHeight="160"
-                   style="-fx-background-color: linear-gradient(#c59af7, #9963e3);
+        <StackPane fx:id="breathingTile" GridPane.rowIndex="0" GridPane.columnIndex="1" onMouseClicked="#onBreathingExercises" prefWidth="160" prefHeight="160" style="-fx-background-color: linear-gradient(#c59af7, #9963e3);
                           -fx-background-radius: 28;
                           -fx-border-radius: 28;
                           -fx-border-color: rgba(0,0,0,0.15);
@@ -79,21 +55,12 @@
                         <Image url="@icons/breathing.png"/>
                     </image>
                 </ImageView>
-                <Label text="Breathing Exercises"
-                       wrapText="true"
-                       textAlignment="CENTER"
-                       prefWidth="130"
-                       style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                <Label text="Breathing Exercises" wrapText="true" textAlignment="CENTER" maxWidth="130" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: white;"/>
             </VBox>
         </StackPane>
 
-        <!-- Journal  Entry -->
-        <StackPane fx:id="journalTile"
-                   GridPane.rowIndex="1" GridPane.columnIndex="0"
-                   onMouseClicked="#onJournalEntry"
-                   prefWidth="160"
-                   prefHeight="160"
-                   style="-fx-background-color: linear-gradient(#8fd8ff, #5ab4f5);
+        <!-- Journal Entry -->
+        <StackPane fx:id="journalTile" GridPane.rowIndex="1" GridPane.columnIndex="0" onMouseClicked="#onJournalEntry" prefWidth="160" prefHeight="160" style="-fx-background-color: linear-gradient(#8fd8ff, #5ab4f5);
                           -fx-background-radius: 28;
                           -fx-border-radius: 28;
                           -fx-border-color: rgba(0,0,0,0.15);
@@ -105,21 +72,12 @@
                         <Image url="@icons/journal.png"/>
                     </image>
                 </ImageView>
-                <Label text="Journal Entry"
-                       wrapText="true"
-                       textAlignment="CENTER"
-                       prefWidth="130"
-                       style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                <Label text="Journal Entry" wrapText="true" textAlignment="CENTER" maxWidth="130" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: white;"/>
             </VBox>
         </StackPane>
 
         <!-- Progress Streaks -->
-        <StackPane fx:id="streakTile"
-                   GridPane.rowIndex="1" GridPane.columnIndex="1"
-                   onMouseClicked="#onProgressStreaks"
-                   prefWidth="160"
-                   prefHeight="160"
-                   style="-fx-background-color: linear-gradient(#ffd27b, #ffb347);
+        <StackPane fx:id="streakTile" GridPane.rowIndex="1" GridPane.columnIndex="1" onMouseClicked="#onProgressStreaks" prefWidth="160" prefHeight="160" style="-fx-background-color: linear-gradient(#ffd27b, #ffb347);
                           -fx-background-radius: 28;
                           -fx-border-radius: 28;
                           -fx-border-color: rgba(0,0,0,0.15);
@@ -131,11 +89,7 @@
                         <Image url="@icons/streaks.png"/>
                     </image>
                 </ImageView>
-                <Label text="Progress Streaks"
-                       wrapText="true"
-                       textAlignment="CENTER"
-                       prefWidth="130"
-                       style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                <Label text="Progress Streaks" wrapText="true" textAlignment="CENTER" maxWidth="130" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: white;"/>
             </VBox>
         </StackPane>
 

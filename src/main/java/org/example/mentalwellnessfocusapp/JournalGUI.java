@@ -27,7 +27,7 @@ public class JournalGUI {
         JournalGUI gui = new JournalGUI();
         gui.show();
     }
-
+    // Show the journal window
     private void show() {
         Stage stage = new Stage();
         stage.setTitle("Journal");
@@ -42,7 +42,7 @@ public class JournalGUI {
                         "-fx-padding: 4 12;"
         );
         backButton.setOnAction(e -> stage.close());
-
+        // Top bar with back button
         HBox topBar = new HBox(backButton);
         topBar.setAlignment(Pos.CENTER_LEFT);
         topBar.setPadding(new Insets(10));
@@ -50,7 +50,7 @@ public class JournalGUI {
         // --- Inputs ---
         TextField titleField = new TextField();
         titleField.setPromptText("Title");
-
+        
         ComboBox<String> moodBox = new ComboBox<>();
         moodBox.getItems().addAll(
                 "😊 Happy",
@@ -62,7 +62,7 @@ public class JournalGUI {
         moodBox.setPromptText("Mood");
         // Font to match subtitles (not bold)
         moodBox.setStyle("-fx-font-size: 16px;");
-
+        // Text area for entry
         TextArea entryArea = new TextArea();
         entryArea.setPromptText("Write your thoughts here...");
         entryArea.setWrapText(true);
@@ -79,10 +79,12 @@ public class JournalGUI {
         moodLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
         entryLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
+        // --- Buttons ---
         Button addButton = new Button("Add Entry");
         Button deleteButton = new Button("Delete Selected");
 
         // Button styles like small homepage tiles
+        // Green  add button
         addButton.setStyle(
                 "-fx-background-color: linear-gradient(#72c96b, #4caf50);" +
                         "-fx-text-fill: white;" +
@@ -90,6 +92,7 @@ public class JournalGUI {
                         "-fx-background-radius: 6;" +
                         "-fx-padding: 4 12;"
         );
+        // Red delete button
         deleteButton.setStyle(
                 "-fx-background-color: linear-gradient(#ff6b6b, #e53935);" +
                         "-fx-text-fill: white;" +
