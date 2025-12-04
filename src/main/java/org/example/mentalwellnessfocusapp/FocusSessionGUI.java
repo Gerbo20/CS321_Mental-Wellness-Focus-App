@@ -102,17 +102,21 @@ public class FocusSessionGUI {
 
         // ========== Center content (what you drew in the sketches) ==========
         centerBox = new VBox(16);
-        centerBox.setPadding(new Insets(16, 16, 16, 16));
+        centerBox.setPadding(new Insets(16, 12, 16, 12));
         centerBox.setAlignment(Pos.CENTER);
         centerBox.setFillWidth(true);
 
         // Screen title inside the page
         Label screenTitle = new Label("Focus Session");
         screenTitle.setStyle("-fx-font-size: 22px; -fx-font-weight: bold;");
+        screenTitle.setMaxWidth(Double.MAX_VALUE);
+        screenTitle.setAlignment(Pos.CENTER);
 
         // Big timer in the middle
         timerLabel = new Label("00:00");
-        timerLabel.setStyle("-fx-font-size: 64px; -fx-font-weight: bold;");
+        timerLabel.setStyle("-fx-font-size: 80px; -fx-font-weight: bold;");
+        timerLabel.setAlignment(Pos.CENTER);
+        timerLabel.setMaxWidth(Double.MAX_VALUE);
 
         // Status text centered under timer
         statusLabel = new Label("Choose a session length to begin.");
@@ -249,7 +253,8 @@ public class FocusSessionGUI {
 
     private void styleLengthButton(Button b) {
         b.setStyle("-fx-background-color: #f1c40f; -fx-text-fill: #2c3e50; -fx-font-weight: bold;");
-        b.setMinWidth(80);
+        b.setMinWidth(70);
+        b.setPrefWidth(70);
         b.setMinHeight(36);
     }
 
