@@ -52,9 +52,11 @@ public class MainController {
     protected void onFocusSession() {
         // Simulate completing a focus session
         completeActivity(ActivityType.FOCUS);
-        
-        String msg = notificationManager.getDailyStreakMessage();
-        welcomeText.setText("Focus Session complete!\n" + msg);
+        // Open the Focus Session GUI
+        // FocusSessionGUI.show(activityLog, streakTracker, notificationManager);
+        FocusSessionGUI.show(streakTracker, activityLog, notificationManager);
+        // String msg = notificationManager.getDailyStreakMessage();
+        // welcomeText.setText("Focus Session complete!\n" + msg);
     }
 
     // Breathing Exercises button handler

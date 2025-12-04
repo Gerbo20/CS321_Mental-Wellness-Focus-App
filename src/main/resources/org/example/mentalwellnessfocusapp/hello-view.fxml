@@ -17,10 +17,10 @@
         <Button fx:id="menuButton" text="≡" onAction="#onMenuClicked" style="-fx-font-size: 18px;
                 -fx-background-color: transparent;
                 -fx-text-fill: #333333;" />
-
-        <Label fx:id="welcomeText" text="Welcome back, Friend 🌱" style="-fx-font-size: 28px; 
-                -fx-font-weight: bold;"/>
     </HBox>
+
+    <Label fx:id="welcomeText" alignment="CENTER" text="Welcome back, Friend 🌱" style="-fx-font-size: 26px; 
+                -fx-font-weight: bold;"/>
 
     <!-- 2x2 Grid of Rounded Tiles -->
     <GridPane fx:id="titleGrid" hgap="20" vgap="20" alignment="CENTER" prefWidth="310" prefHeight="384">

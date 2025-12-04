@@ -10,6 +10,7 @@ org/example/mentalwellnessfocusapp/ActivityLog$1.class
 org/example/mentalwellnessfocusapp/JournalGUI$1.class
 org/example/mentalwellnessfocusapp/Journal.class
 org/example/mentalwellnessfocusapp/App.class
+org/example/mentalwellnessfocusapp/FocusSessionGUI.class
 org/example/mentalwellnessfocusapp/UserProfile.class
 org/example/mentalwellnessfocusapp/HomepageGUI.class
 org/example/mentalwellnessfocusapp/JournalEntry.class
