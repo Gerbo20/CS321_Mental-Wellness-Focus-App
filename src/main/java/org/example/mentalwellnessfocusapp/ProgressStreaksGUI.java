@@ -32,7 +32,7 @@ public class ProgressStreaksGUI {
         Stage stage = new Stage();
         stage.setTitle("Progress Streaks");
 
-        // --- Back button ---
+        // --- Back button --- hi
         Button backButton = new Button("Back");
         backButton.setOnAction(e -> stage.close());
         backButton.setStyle(
