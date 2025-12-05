@@ -18,7 +18,7 @@ public class HomepageGUI extends Application {
 
         Scene scene = new Scene(fxmlLoader.load(), 360, 640);
 
-        stage.setTitle("Mental Wellness Focus App!");
+        stage.setTitle("Welcome to MindAlign!");
         stage.setScene(scene);
         stage.setResizable(false);
         stage.show();

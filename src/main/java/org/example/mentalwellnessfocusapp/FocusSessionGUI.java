@@ -29,6 +29,7 @@ public class FocusSessionGUI {
     // Core app objects
     private final StreakTracker streakTracker;
     private final ActivityLog activityLog;
+    private final UserProfile userProfile;
     private final NotificationManager notificationManager;
 
     // UI
@@ -59,17 +60,21 @@ public class FocusSessionGUI {
 
     private FocusSessionGUI(StreakTracker streakTracker,
                             ActivityLog activityLog,
-                            NotificationManager notificationManager) {
+                            UserProfile userProfile,
+                            NotificationManager notificationManager
+                        ) {
         this.streakTracker = Objects.requireNonNull(streakTracker);
         this.activityLog = Objects.requireNonNull(activityLog);
+        this.userProfile = Objects.requireNonNull(userProfile);
         this.notificationManager = Objects.requireNonNull(notificationManager);
     }
 
     // --------- Entry point from MainController ---------
     public static void show(StreakTracker streakTracker,
                             ActivityLog activityLog,
+                            UserProfile userProfile,
                             NotificationManager notificationManager) {
-        FocusSessionGUI gui = new FocusSessionGUI(streakTracker, activityLog, notificationManager);
+        FocusSessionGUI gui = new FocusSessionGUI(streakTracker, activityLog, userProfile, notificationManager);
         gui.buildAndShow();
     }
 
@@ -195,7 +200,9 @@ public class FocusSessionGUI {
         );
         quickJournalAfterButton.setMinWidth(220);
         quickJournalAfterButton.setMinHeight(50);
-        quickJournalAfterButton.setOnAction(e -> JournalGUI.showJournalWindow());
+        quickJournalAfterButton.setOnAction(e -> 
+            JournalGUI.showJournalWindow(userProfile, activityLog, streakTracker)
+        );
         quickJournalAfterButton.setVisible(false);
         
         // Close button (acts like Back)
@@ -459,8 +466,10 @@ public class FocusSessionGUI {
             popup.close();
             startFiveMinuteBreakWindow();
         });
-
-        quickJournalBtn.setOnAction(e -> JournalGUI.showJournalWindow());
+        // Open journal window on click
+        quickJournalBtn.setOnAction(e -> 
+            JournalGUI.showJournalWindow(userProfile, activityLog, streakTracker)
+        );
 
         closeBtn.setOnAction(e -> popup.close());
 
@@ -596,7 +605,7 @@ public class FocusSessionGUI {
         btnCustom.setManaged(false);
 
         startButton.setVisible(false);
-        startButton.setManaged(false);;
+        startButton.setManaged(false);
 
         // resumeButton.setVisible(true);
         // abortButton.setVisible(true);

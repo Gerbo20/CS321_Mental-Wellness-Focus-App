@@ -47,16 +47,28 @@ public class ProgressStreaksGUI {
         // --- Streak summary label ---
         Label summary = new Label();
         summary.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+
+        // // Use ALL days for the current profile
+        // java.util.List<DayActivity> allDays = log.getAllDays();
+        // int streak = computeCurrentStreakFromActivity(allDays);
+        // updateStreakSummaryText(summary, streak);
         int streak = tracker.getStreak();
-        if (streak == 0) {
-            summary.setText("You haven’t started a streak yet. 🌱");
+        boolean hasAnyActivity = !log.getAllDays().isEmpty();
+
+        if (streak > 0) {
+        summary.setText(
+                "Current streak: " + streak +
+                " day" + (streak == 1 ? "" : "s") + " in a row 🔥"
+        );
+        } else if (hasAnyActivity) {
+                // User has done *something* today or before, but hasn’t built a streak yet
+                summary.setText("You’re just getting started. 🌱");
         } else {
-            summary.setText("Current streak: " + streak +
-                    " day" + (streak == 1 ? "" : "s") + " in a row 🔥");
+                // Truly no activity at all
+                summary.setText("You haven’t started a streak yet. 🌱");
         }
 
         // --- TABLE: daily activity ---
-    
         TableView<DayActivity> table = new TableView<>();
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
 

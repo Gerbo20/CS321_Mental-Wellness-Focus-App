@@ -19,14 +19,47 @@ import javafx.stage.Stage;
 
 public class JournalGUI {
 
-    // static so entries persist between openings
-    private static final App app = new App();
+    // One shared App instance backing the journal, tied to the current user profile
+    private static App app;
+    
 
-    // Called from MainController
-    public static void showJournalWindow() {
-        JournalGUI gui = new JournalGUI();
+    // Per-window references so we can log activity + streaks
+    private final ActivityLog activityLog;
+    private final StreakTracker streakTracker;
+
+    private JournalGUI(ActivityLog activityLog, StreakTracker streakTracker) {
+        this.activityLog = activityLog;
+        this.streakTracker = streakTracker;
+    }
+
+    // Called from MainController, now with the current UserProfile + logs
+    public static void showJournalWindow(UserProfile userProfile,
+                                         ActivityLog activityLog,
+                                         StreakTracker streakTracker) {
+        
+        // Require a profile name before using the journal
+        String name = userProfile.getName();
+        if (name == null || name.isBlank()) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Profile Required");
+            alert.setHeaderText(null);
+            alert.setContentText("Please add your name in the Menu > Profile Settings before using the journal.");
+            alert.showAndWait();
+            return;
+        }
+        
+        // Initialize or refresh App for this profile
+        if (app == null) {
+            app = new App(userProfile);
+        } else {
+            // Profile name may have changed -> reload journal entries for current profile
+            app.reloadForCurrentProfile();
+        }
+
+        JournalGUI gui = new JournalGUI(activityLog, streakTracker);
         gui.show();
     }
+
     // Show the journal window
     private void show() {
         Stage stage = new Stage();
@@ -36,13 +69,13 @@ public class JournalGUI {
         Button backButton = new Button("Back");
         backButton.setStyle(
                 "-fx-background-color: linear-gradient(#5ab4f5, #368de8);" +
-                        "-fx-text-fill: white;" +
-                        "-fx-font-weight: bold;" +
-                        "-fx-background-radius: 6;" +
-                        "-fx-padding: 4 12;"
+                "-fx-text-fill: white;" +
+                "-fx-font-weight: bold;" +
+                "-fx-background-radius: 6;" +
+                "-fx-padding: 4 12;"
         );
         backButton.setOnAction(e -> stage.close());
-        // Top bar with back button
+
         HBox topBar = new HBox(backButton);
         topBar.setAlignment(Pos.CENTER_LEFT);
         topBar.setPadding(new Insets(10));
@@ -50,7 +83,7 @@ public class JournalGUI {
         // --- Inputs ---
         TextField titleField = new TextField();
         titleField.setPromptText("Title");
-        
+
         ComboBox<String> moodBox = new ComboBox<>();
         moodBox.getItems().addAll(
                 "😊 Happy",
@@ -60,9 +93,8 @@ public class JournalGUI {
                 "😴 Tired"
         );
         moodBox.setPromptText("Mood");
-        // Font to match subtitles (not bold)
         moodBox.setStyle("-fx-font-size: 16px;");
-        // Text area for entry
+
         TextArea entryArea = new TextArea();
         entryArea.setPromptText("Write your thoughts here...");
         entryArea.setWrapText(true);
@@ -70,8 +102,6 @@ public class JournalGUI {
         entryArea.setMinHeight(160);
         entryArea.setMaxHeight(220);
 
-
-        // Subtitle labels (Title, Mood, Entry)
         Label titleLabel = new Label("Title:");
         Label moodLabel  = new Label("Mood:");
         Label entryLabel = new Label("Entry:");
@@ -79,28 +109,24 @@ public class JournalGUI {
         moodLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
         entryLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
-        // --- Buttons ---
         Button addButton = new Button("Add Entry");
         Button deleteButton = new Button("Delete Selected");
 
-        // Button styles like small homepage tiles
-        // Green  add button
         addButton.setStyle(
                 "-fx-background-color: linear-gradient(#72c96b, #4caf50);" +
-                        "-fx-text-fill: white;" +
-                        "-fx-font-weight: bold;" +
-                        "-fx-background-radius: 6;" +
-                        "-fx-padding: 4 12;"
+                "-fx-text-fill: white;" +
+                "-fx-font-weight: bold;" +
+                "-fx-background-radius: 6;" +
+                "-fx-padding: 4 12;"
         );
-        // Red delete button
         deleteButton.setStyle(
                 "-fx-background-color: linear-gradient(#ff6b6b, #e53935);" +
-                        "-fx-text-fill: white;" +
-                        "-fx-font-weight: bold;" +
-                        "-fx-background-radius: 6;" +
-                        "-fx-padding: 4 12;"
+                "-fx-text-fill: white;" +
+                "-fx-font-weight: bold;" +
+                "-fx-background-radius: 6;" +
+                "-fx-padding: 4 12;"
         );
-
+        // --- Layout ---
         HBox buttonRow = new HBox(10, addButton, deleteButton);
         buttonRow.setAlignment(Pos.CENTER_RIGHT);
 
@@ -111,7 +137,7 @@ public class JournalGUI {
 
         Label countLabel = new Label("Total Entries: 0");
 
-        // Only show date + title in the list
+        // Custom cell to show date + title
         listView.setCellFactory(lv -> new ListCell<>() {
             @Override
             protected void updateItem(JournalEntry item, boolean empty) {
@@ -124,7 +150,7 @@ public class JournalGUI {
             }
         });
 
-        // When an entry is selected, show its contents in the fields
+        // When an entry is selected, populate the input fields
         listView.getSelectionModel().selectedItemProperty().addListener(
                 (obs, oldEntry, entry) -> {
                     if (entry != null) {
@@ -133,49 +159,54 @@ public class JournalGUI {
                         entryArea.setText(entry.getEntry());
                     }
                 });
-
-        // Layout: input area
+        // --- Final assembly ---
         VBox inputBox = new VBox(8,
                 titleLabel, titleField,
                 moodLabel, moodBox,
                 entryLabel, entryArea,
                 buttonRow
         );
+        
         inputBox.setPadding(new Insets(10));
+        
 
-        // Layout: entries list
         VBox listBox = new VBox(8,
                 entriesLabel,
                 listView,
                 countLabel
         );
+
+        
         VBox.setVgrow(listView, Priority.ALWAYS);
         listBox.setPadding(new Insets(10));
-
-        // Main vertical content (under the back bar)
+        
+        // --- Overall layout ---
         VBox mainContent = new VBox(10, inputBox, listBox);
         mainContent.setPadding(new Insets(10));
-
-        // Root with top bar + content
+        // Stretch to fill
         BorderPane root = new BorderPane();
         root.setTop(topBar);
         root.setCenter(mainContent);
         root.setStyle("-fx-background-color: #f5f5f5;");
-
-        Scene scene = new Scene(root, 360, 640); // same mobile-ish size
+        
+        // --- Scene and stage ---
+        Scene scene = new Scene(root, 360, 640);
         stage.setScene(scene);
         stage.show();
 
         // --- Button logic ---
-
+        // Add button logic
         addButton.setOnAction(e -> {
             String title = titleField.getText();
             String mood = (moodBox.getValue() == null) ? "Unspecified" : moodBox.getValue();
             String entry = entryArea.getText();
 
             if (app.addEntry(title, mood, entry)) {
+                // Only here do we log a JOURNAL activity + streak
+                activityLog.recordToday(ActivityType.JOURNAL);
+                streakTracker.completeToday();
+
                 refreshList(listView, countLabel);
-                // clear selection + fields after saving
                 listView.getSelectionModel().clearSelection();
                 titleField.clear();
                 entryArea.clear();
@@ -185,12 +216,12 @@ public class JournalGUI {
             }
         });
 
+        // Delete button logic
         deleteButton.setOnAction(e -> {
             int index = listView.getSelectionModel().getSelectedIndex();
             if (index >= 0) {
                 if (app.deleteEntry(index)) {
                     refreshList(listView, countLabel);
-                    // clear fields after delete
                     listView.getSelectionModel().clearSelection();
                     titleField.clear();
                     entryArea.clear();
@@ -204,12 +235,13 @@ public class JournalGUI {
         // initial population
         refreshList(listView, countLabel);
     }
-
+    // Refresh the list of entries from the App
     private void refreshList(ListView<JournalEntry> listView, Label countLabel) {
         listView.getItems().setAll(app.getEntries());
         countLabel.setText("Total Entries: " + app.getEntryCount());
     }
-
+    
+    // Show an alert dialog with a message
     private void showAlert(String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Journal");

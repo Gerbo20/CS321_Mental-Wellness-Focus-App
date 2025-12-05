@@ -4,12 +4,18 @@ import java.util.List;
 
 public class App {
 
-    // This Journal holds all the entries in memory
-    private final Journal journal = new Journal();
+    private final UserProfile userProfile;
+    private final Journal journal;
 
-    public App() {
-        // Optional: you can start with a sample entry using journal.addEntry(...)
-        // journal.addEntry("Welcome!", "😊 Happy", "This is your first journal entry.");
+    // App is now tied to a specific user/profile
+    public App(UserProfile userProfile) {
+        this.userProfile = userProfile;
+        this.journal = new Journal(userProfile);
+    }
+
+    // If the current profile name changes, reload that user's entries
+    public void reloadForCurrentProfile() {
+        journal.reloadForCurrentProfile();
     }
 
     public boolean addEntry(String title, String mood, String entry) {
