@@ -10,9 +10,11 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -28,15 +30,23 @@ public class BreathingGUI {
     private Stage stage;
     private BreathingCircle breathingCircle;
     private Label phaseLabel;
+
     private Button startButton;
     private Button backButton;
+    private Button pauseButton;
+    private Button resetButton;
 
-    // For changing text "Inhale" / "Exhale" in sync with animation
+    private BorderPane root;
+    private VBox centerBox;
+    private HBox controlButtonsBox;
+
+    // For changing text "Inhale" / "Exhale" / "Hold" in sync with animation
     private Timeline phaseTimeline;
+    private boolean isPaused = false;
 
     private BreathingGUI(StreakTracker streakTracker,
-                        ActivityLog activityLog,
-                        NotificationManager notificationManager) {
+                         ActivityLog activityLog,
+                         NotificationManager notificationManager) {
         this.streakTracker = Objects.requireNonNull(streakTracker);
         this.activityLog = Objects.requireNonNull(activityLog);
         this.notificationManager = Objects.requireNonNull(notificationManager);
@@ -53,27 +63,31 @@ public class BreathingGUI {
         stage.setTitle("Breathing Exercises");
         stage.setResizable(false);
 
-        BorderPane root = new BorderPane();
+        root = new BorderPane();
         root.setPadding(new Insets(12));
         root.setStyle("-fx-background-color: #f7f7f7;");
 
-        // ----- Top bar: Back -----
+        // ----- Top bar: Back (initial position) -----
         backButton = new Button("Back");
-        backButton.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold;");
+        backButton.setStyle(
+                "-fx-background-color: #3498db; " +
+                        "-fx-text-fill: white; " +
+                        "-fx-font-weight: bold;"
+        );
         backButton.setOnAction(e -> stage.close());
 
-        BorderPane topBar = new BorderPane();
-        topBar.setLeft(backButton);
-        topBar.setPadding(new Insets(4, 0, 4, 0));
+        HBox topBar = new HBox(backButton);
+        topBar.setAlignment(Pos.TOP_LEFT);
+        topBar.setPadding(new Insets(0, 0, 10, 0));
         root.setTop(topBar);
 
-        // ----- Center: title, circle, instructions, Start button -----
-        VBox centerBox = new VBox(18);
-        centerBox.setPadding(new Insets(16));
+        // ----- Center content -----
+        centerBox = new VBox(16);
         centerBox.setAlignment(Pos.TOP_CENTER);
-        centerBox.setFillWidth(true);
+        // Slight padding so the bottom buttons sit a bit higher
+        centerBox.setPadding(new Insets(10, 0, 30, 0));
 
-        Label screenTitle = new Label("Breathing Exercises");
+        Label screenTitle = new Label("Breathing Timer");
         screenTitle.setStyle("-fx-font-size: 22px; -fx-font-weight: bold;");
 
         breathingCircle = new BreathingCircle(60, 100);
@@ -82,19 +96,22 @@ public class BreathingGUI {
         phaseLabel.setStyle("-fx-font-size: 16px;");
         phaseLabel.setWrapText(true);
         phaseLabel.setAlignment(Pos.CENTER);
+        phaseLabel.setTextAlignment(TextAlignment.CENTER);
         phaseLabel.setMaxWidth(280);
 
+        // Spacer: pushes buttons down but not all the way to the bottom
         Region spacer = new Region();
-        VBox.setVgrow(spacer, Priority.ALWAYS);
+        spacer.setMinHeight(40);
+        VBox.setVgrow(spacer, Priority.SOMETIMES);
 
         startButton = new Button("Start Exercise");
         startButton.setMinWidth(220);
         startButton.setMinHeight(50);
         startButton.setStyle(
                 "-fx-background-color: #27ae60; " +
-                "-fx-text-fill: white; " +
-                "-fx-font-size: 18px; " +
-                "-fx-font-weight: bold;"
+                        "-fx-text-fill: white; " +
+                        "-fx-font-size: 18px; " +
+                        "-fx-font-weight: bold;"
         );
         startButton.setOnAction(e -> startBreathing());
 
@@ -114,17 +131,151 @@ public class BreathingGUI {
     }
 
     private void startBreathing() {
-        // Optional: log breathing activity once when user starts
+        // Log breathing activity once when user starts
         activityLog.recordToday(ActivityType.BREATHING);
 
-        // 4 seconds inhale, 4 seconds exhale
+        // 4 seconds inhale, 4 seconds hold, 6 seconds exhale
         Duration inhale = Duration.seconds(4);
         Duration hold = Duration.seconds(4);
         Duration exhale = Duration.seconds(6);
 
+        isPaused = false;
+
         breathingCircle.startBreathing(inhale, hold, exhale);
         startPhaseTextCycle(inhale, hold, exhale);
-        startButton.setDisable(true);
+
+        // Replace the big "Start Exercise" button with Back / Pause / Reset
+        swapToControlButtonsLayout();
+    }
+
+    /**
+     * After the exercise has started:
+     * - remove "Start Exercise"
+     * - move Back button down
+     * - show Back / Pause / Reset in a row
+     */
+    private void swapToControlButtonsLayout() {
+        // Remove Start button from the bottom
+        centerBox.getChildren().remove(startButton);
+
+        // Remove Back button from the top bar and move it down
+        root.setTop(null);
+
+        if (controlButtonsBox == null) {
+            pauseButton = new Button("Pause");
+            resetButton = new Button("Reset");
+
+            backButton.setMinWidth(80);
+            pauseButton.setMinWidth(80);
+            resetButton.setMinWidth(80);
+
+            String controlStyle =
+                    "-fx-background-color: #3498db; " +
+                            "-fx-text-fill: white; " +
+                            "-fx-font-weight: bold;";
+
+            backButton.setStyle(controlStyle);
+            pauseButton.setStyle(controlStyle);
+            resetButton.setStyle(controlStyle);
+
+            pauseButton.setOnAction(e -> onPauseResume());
+            resetButton.setOnAction(e -> onReset());
+
+            controlButtonsBox = new HBox(10, backButton, pauseButton, resetButton);
+            controlButtonsBox.setAlignment(Pos.CENTER);
+            controlButtonsBox.setPadding(new Insets(10, 0, 10, 0));
+        } else {
+            // Make sure the Back button lives with Pause/Reset
+            controlButtonsBox.getChildren().setAll(backButton, pauseButton, resetButton);
+        }
+
+        if (!centerBox.getChildren().contains(controlButtonsBox)) {
+            centerBox.getChildren().add(controlButtonsBox);
+        }
+    }
+
+    /**
+     * Restore the original layout: top-left Back + big Start button.
+     */
+    private void restoreStartLayout() {
+        // Stop any running phase timeline
+        if (phaseTimeline != null) {
+            phaseTimeline.stop();
+        }
+
+        // Remove the control buttons from the center
+        if (controlButtonsBox != null) {
+            controlButtonsBox.getChildren().remove(backButton);
+            centerBox.getChildren().remove(controlButtonsBox);
+        }
+
+        // Put the Back button back on the top bar
+        HBox topBar = new HBox(backButton);
+        topBar.setAlignment(Pos.TOP_LEFT);
+        topBar.setPadding(new Insets(0, 0, 10, 0));
+        root.setTop(topBar);
+
+        // Restore the big Start Exercise button
+        if (!centerBox.getChildren().contains(startButton)) {
+            centerBox.getChildren().add(startButton);
+        }
+
+        isPaused = false;
+        if (pauseButton != null) {
+            pauseButton.setText("Pause");
+        }
+
+        // Reset texts
+        breathingCircle.setPhaseText("Ready");
+        phaseLabel.setText("Inhale as the circle grows, exhale as it shrinks.");
+        phaseLabel.setTextAlignment(TextAlignment.CENTER);
+    }
+
+    private void onPauseResume() {
+        if (isPaused) {
+            // Resume
+            isPaused = false;
+            breathingCircle.resumeBreathing();
+            if (phaseTimeline != null) {
+                phaseTimeline.play();
+            }
+            pauseButton.setText("Pause");
+            updatePhasePromptForCurrentStage(); // go back to correct prompt
+        } else {
+            // Pause
+            isPaused = true;
+            breathingCircle.pauseBreathing();
+            if (phaseTimeline != null) {
+                phaseTimeline.pause();
+            }
+            pauseButton.setText("Resume");
+            phaseLabel.setText("Paused — tap Resume when you're ready.");
+            phaseLabel.setTextAlignment(TextAlignment.CENTER);
+        }
+    }
+
+    private void onReset() {
+        // Stop animations and reset visuals
+        breathingCircle.resetBreathing();
+        restoreStartLayout();
+    }
+
+    /**
+     * Look at the current phase text inside the circle and
+     * set the matching instructional prompt.
+     */
+    private void updatePhasePromptForCurrentStage() {
+        String phase = breathingCircle.getPhaseText();
+        if ("Inhale".equalsIgnoreCase(phase)) {
+            phaseLabel.setText("Breathe in slowly...");
+        } else if ("Hold".equalsIgnoreCase(phase)) {
+            phaseLabel.setText("Gently hold your breath...");
+        } else if ("Exhale".equalsIgnoreCase(phase)) {
+            phaseLabel.setText("Breathe out gently...");
+        } else {
+            phaseLabel.setText("Inhale as the circle grows, exhale as it shrinks.");
+        }
+        phaseLabel.setTextAlignment(TextAlignment.CENTER);
     }
 
     private void startPhaseTextCycle(Duration inhale, Duration hold, Duration exhale) {
@@ -135,25 +286,28 @@ public class BreathingGUI {
         double inhaleSecs = inhale.toSeconds();
         double holdSecs   = hold.toSeconds();
         double exhaleSecs = exhale.toSeconds();
-        double cycleSecs = inhaleSecs + holdSecs + exhaleSecs;
+        double cycleSecs  = inhaleSecs + holdSecs + exhaleSecs;
 
         phaseTimeline = new Timeline(
                 // before inhale: INHALE
                 new KeyFrame(Duration.ZERO, e -> {
                     breathingCircle.setPhaseText("Inhale");
                     phaseLabel.setText("Breathe in slowly...");
+                    phaseLabel.setTextAlignment(TextAlignment.CENTER);
                 }),
 
                 // after inhale: HOLD
                 new KeyFrame(Duration.seconds(inhaleSecs), e -> {
                     breathingCircle.setPhaseText("Hold");
                     phaseLabel.setText("Gently hold your breath...");
+                    phaseLabel.setTextAlignment(TextAlignment.CENTER);
                 }),
 
                 // after inhale + hold: EXHALE
                 new KeyFrame(Duration.seconds(inhaleSecs + holdSecs), e -> {
                     breathingCircle.setPhaseText("Exhale");
                     phaseLabel.setText("Breathe out gently...");
+                    phaseLabel.setTextAlignment(TextAlignment.CENTER);
                 }),
 
                 // after full cycle: repeat

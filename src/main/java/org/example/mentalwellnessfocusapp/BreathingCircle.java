@@ -43,25 +43,24 @@ public class BreathingCircle extends StackPane {
 
         // Text in the middle ("Inhale", "Exhale", etc.)
         phaseText = new Text("Ready");
-        phaseText.setFill(Color.web("#2c3e50"));
+        phaseText.setFill(Color.web("#ffffff"));
         phaseText.setFont(Font.font("System", 18));
 
         setAlignment(Pos.CENTER);
         getChildren().addAll(outerCircle, innerCircle, phaseText);
 
-        setMinSize((maxInnerRadius + 40) * 2, (maxInnerRadius + 40) * 2);
-        setMaxSize((maxInnerRadius + 40) * 2, (maxInnerRadius + 40) * 2);
+        double size = (maxInnerRadius + 40) * 2;
+        setMinSize(size, size);
+        setMaxSize(size, size);
     }
 
     /**
-     * Start an infinite inhale/exhale animation.
+     * Start the breathing animation with an inhale, optional hold, and exhale.
      */
-    public void startBreathing(Duration inhaleDuration, Duration holdDuration, Duration exhaleDuration) {
-
-        // Stop any previous animation
-        if (breathingSequence != null) {
-            breathingSequence.stop();
-        }
+    public void startBreathing(Duration inhaleDuration,
+                               Duration holdDuration,
+                               Duration exhaleDuration) {
+        stopBreathing();
 
         // Inhale animation
         Timeline inhale = createRadiusAnimation(
@@ -88,7 +87,7 @@ public class BreathingCircle extends StackPane {
                 exhaleDuration
         );
 
-        // If holdDuration is 0, you *can* still include it, but it's cleaner to skip:
+        // If holdDuration is 0, we can skip the hold Timeline
         if (holdDuration.greaterThan(Duration.ZERO)) {
             breathingSequence = new SequentialTransition(inhale, hold, exhale);
         } else {
@@ -97,18 +96,48 @@ public class BreathingCircle extends StackPane {
 
         breathingSequence.setCycleCount(Animation.INDEFINITE);
         breathingSequence.play();
-}
+    }
 
-    // Overloaded method for inhale/exhale without hold
+    /**
+     * Convenience overload: inhale + exhale only.
+     */
     public void startBreathing(Duration inhaleDuration, Duration exhaleDuration) {
         startBreathing(inhaleDuration, Duration.ZERO, exhaleDuration);
     }
 
-    // Stop the breathing animation
+    /**
+     * Stop the breathing animation completely.
+     */
     public void stopBreathing() {
         if (breathingSequence != null) {
             breathingSequence.stop();
         }
+    }
+
+    /**
+     * Pause the breathing animation (can be resumed).
+     */
+    public void pauseBreathing() {
+        if (breathingSequence != null) {
+            breathingSequence.pause();
+        }
+    }
+
+    /**
+     * Resume a paused breathing animation.
+     */
+    public void resumeBreathing() {
+        if (breathingSequence != null) {
+            breathingSequence.play();
+        }
+    }
+
+    /**
+     * Reset the circle to its initial state.
+     */
+    public void resetBreathing() {
+        stopBreathing();
+        innerCircle.setRadius(minInnerRadius);
     }
 
     private Timeline createRadiusAnimation(Circle circle,
@@ -117,22 +146,31 @@ public class BreathingCircle extends StackPane {
                                            Duration duration) {
         Timeline timeline = new Timeline();
 
-        KeyValue startKV = new KeyValue(circle.radiusProperty(),
-                                        fromRadius,
-                                        Interpolator.EASE_BOTH);
-        KeyValue endKV   = new KeyValue(circle.radiusProperty(),
-                                        toRadius,
-                                        Interpolator.EASE_BOTH);
+        KeyValue startKV = new KeyValue(
+                circle.radiusProperty(),
+                fromRadius,
+                Interpolator.EASE_BOTH
+        );
+        KeyValue endKV = new KeyValue(
+                circle.radiusProperty(),
+                toRadius,
+                Interpolator.EASE_BOTH
+        );
 
         KeyFrame startKF = new KeyFrame(Duration.ZERO, startKV);
-        KeyFrame endKF   = new KeyFrame(duration, endKV);
+        KeyFrame endKF = new KeyFrame(duration, endKV);
 
         timeline.getKeyFrames().addAll(startKF, endKF);
         return timeline;
     }
 
-    /** Let the UI set "Inhale" / "Exhale" / etc. */
+    /** Let the UI set "Inhale" / "Exhale" / "Hold" / etc. */
     public void setPhaseText(String text) {
         phaseText.setText(text);
+    }
+
+    /** Allow the GUI to read the current phase text. */
+    public String getPhaseText() {
+        return phaseText.getText();
     }
 }
